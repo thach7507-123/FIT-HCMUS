@@ -135,7 +135,7 @@ Mã trong test_gen.cpp được thiết kế để sinh dữ liệu bao phủ c�
 
 ### 2.1. Cấu trúc và logic sinh test case
 
-Mã trong `test_gen.cpp` (hàm `gen_strlenlexi`) được thiết kế tinh vi để sinh ra các tập dữ liệu mảng chuỗi với quy mô lớn ($N = 10,000$). Khác với việc sắp xếp số nguyên, bộ test này tập trung khai thác điểm yếu chí mạng của các template code thủ công trong việc xử lý **chi phí so sánh chuỗi ($O(L)$)**, bẫy phân mảnh bộ nhớ và các trường hợp suy thoái cây đệ quy. Các test case được tạo dựa trên 5 kịch bản logic chính:
+Mã trong `test_gen.cpp` (hàm `gen_strlenlexi`) được thiết kế tinh vi để sinh ra các tập dữ liệu mảng chuỗi với quy mô lớn ($N = 10,000$). Khác với việc sắp xếp số nguyên, bộ test này tập trung khai thác điểm yếu chí mạng của các template code thủ công trong việc xử lý **chi phí so sánh chuỗi (O(L))**, bẫy phân mảnh bộ nhớ và các trường hợp suy thoái cây đệ quy. Các test case được tạo dựa trên 5 kịch bản logic chính:
 
 * **Test001.in - Longest Common Prefix (Tiền tố chung cực dài):** Toàn bộ $10,000$ chuỗi đều đạt độ dài tối đa 100. 99 ký tự đầu tiên của tất cả các chuỗi giống hệt nhau (toàn bộ là `a`), sự khác biệt duy nhất nằm ở ký tự thứ 100 được sinh ngẫu nhiên.
 * **Test002.in - Massive Duplicates (Bùng nổ chuỗi trùng lặp):** Mảng chứa $10,000$ phần tử nhưng chỉ có đúng 3 chuỗi duy nhất xuất hiện (với độ dài 100). Ba chuỗi này được lặp đi lặp lại và xáo trộn ngẫu nhiên liên tục.
