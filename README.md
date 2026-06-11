@@ -152,8 +152,6 @@ Các thuật toán mục tiêu mà bộ test này nhắm tới để triệt ti�
 * **Quick Sort thủ công:** Đặc biệt là các bản code không sử dụng kỹ thuật phân hoạch 3 chiều (3-way partitioning / Dutch National Flag) hoặc sử dụng chốt (pivot) cố định.
 * **Radix Sort thủ công:** Bao gồm cả hệ thống phân nhánh từ đầu đến cuối (MSD - Most Significant Digit) và sắp xếp từ cuối lên đầu cần đệm chuỗi (LSD - Least Significant Digit).
 * **Hàm so sánh (Comparator) kém tối ưu:** Nhắm vào các hàm viết gộp chung tiêu chí độ dài và từ điển nhưng không tối ưu hóa luồng rẽ nhánh logic.
-* **Hàm sắp xếp thư viện chuẩn (`std::sort`):** Dùng làm mốc đo lường khả năng chịu tải chi phí so sánh (Overhead comparison).
-
 ---
 
 ### 2.3. Lý giải việc chọn thuật toán và tác dụng của Test
