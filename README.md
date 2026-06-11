@@ -135,32 +135,38 @@ Mã trong test_gen.cpp được thiết kế để sinh dữ liệu bao phủ c�
 
 ### 2.1. Cấu trúc và logic sinh test case
 
-Mã trong `test_gen.cpp` (hàm `gen_strlenlexi`) được thiết kế tinh vi để sinh ra các tập dữ liệu mảng chuỗi với quy mô lớn (N = 100,000). Khác với việc sắp xếp số nguyên, bộ test này tập trung khai thác điểm yếu của các thuật toán trong việc xử lý **chi phí so sánh chuỗi**, đặc biệt là khi các chuỗi có tiền tố (prefix) giống hệt nhau kéo dài. Các test case được tạo dựa trên 5 kịch bản logic chính:
+Mã trong `test_gen.cpp` (hàm `gen_strlenlexi`) được thiết kế tinh vi để sinh ra các tập dữ liệu mảng chuỗi với quy mô lớn ($N = 10,000$). Khác với việc sắp xếp số nguyên, bộ test này tập trung khai thác điểm yếu chí mạng của các template code thủ công trong việc xử lý **chi phí so sánh chuỗi ($O(L)$)**, bẫy phân mảnh bộ nhớ và các trường hợp suy thoái cây đệ quy. Các test case được tạo dựa trên 5 kịch bản logic chính:
 
-* **Test001.in - Trùng lặp tiền tố diện rộng:** Toàn bộ chuỗi chia sẻ chung một khối tiền tố rất dài (90 ký tự `a`), sự khác biệt duy nhất nằm ở sự đột biến ngẫu nhiên của 10 ký tự cuối cùng.
-* **Test002.in - Ngẫu nhiên hoàn toàn (Average-case):** Chuỗi dài 100 ký tự được sinh ngẫu nhiên hoàn toàn từ tập ký tự `a` đến `z`. Test này kiểm tra tính đúng đắn và hiệu năng tổng quát.
-* **Test003.in - Đột biến cực đoan (Worst-case chi phí so sánh):** Cấu trúc chuỗi bị ép vào một khuôn mẫu cứng nhắc với 8 ký tự `a` nối tiếp bởi 91 ký tự `b`. Sự xáo trộn chỉ xảy ra ở **duy nhất 1 ký tự cuối cùng**. 
-* **Test004.in - Bẫy so sánh hai chiều:** Chuỗi bắt đầu bằng 96 ký tự `a`, có 3 ký tự ngẫu nhiên kẹp ở giữa, và luôn bị "khóa đuôi" bằng ký tự `a`. Kịch bản này được thiết kế để lừa các thuật toán có cơ chế tối ưu ngây thơ (ví dụ: chỉ so sánh ký tự đầu và cuối).
-* **Test005.in - Độ đa dạng thấp (Binary Random):** Cố định 86 ký tự `a` làm tiền tố. Đoạn 14 ký tự đuôi được xáo trộn nhưng chỉ được cấu thành từ một tập hợp cực kỳ hạn chế gồm đúng 2 ký tự `a` và `b`.
+* **Test001.in - Longest Common Prefix (Tiền tố chung cực dài):** Toàn bộ $10,000$ chuỗi đều đạt độ dài tối đa 100. 99 ký tự đầu tiên của tất cả các chuỗi giống hệt nhau (toàn bộ là `a`), sự khác biệt duy nhất nằm ở ký tự thứ 100 được sinh ngẫu nhiên.
+* **Test002.in - Massive Duplicates (Bùng nổ chuỗi trùng lặp):** Mảng chứa $10,000$ phần tử nhưng chỉ có đúng 3 chuỗi duy nhất xuất hiện (với độ dài 100). Ba chuỗi này được lặp đi lặp lại và xáo trộn ngẫu nhiên liên tục.
+* **Test003.in - MSD Radix Sort Trap (Bẫy phân mảnh MSD):** Các chuỗi có độ dài 100, trong đó 4 ký tự đầu tiên liên tục thay đổi để phân bổ đều khắp 26 chữ cái, nhưng 96 ký tự phía sau lại bị ép cho giống hệt nhau (toàn `a`).
+* **Test004.in - Reverse Sorted Anti-Pivot (Nghịch đảo thứ tự):** Mảng chứa $10,000$ chuỗi ngẫu nhiên (độ dài 100) đã được sắp xếp **nghịch biến** (ngược lại hoàn toàn với yêu cầu của bài toán: ưu tiên chuỗi dài lên trước, sau đó từ điển giảm dần).
+* **Test005.in - Length-Boundary Edge Case (Sự giao thoa độ dài):** Các chuỗi có độ dài dao động liên tục từ 10 đến 100. Tuy nhiên, nội dung các chuỗi đều chia sẻ chung một chuỗi gốc tuần hoàn (`abcdef...`), chỉ khác nhau ở độ dài bị cắt và một ký tự ngẫu nhiên ở cuối.
+
+---
 
 ### 2.2. Thuật toán mục tiêu
 
-Các thuật toán mục tiêu mà bộ test này nhắm tới để đánh giá và thử thách hiệu năng bao gồm:
+Các thuật toán mục tiêu mà bộ test này nhắm tới để triệt tiêu hiệu năng bao gồm:
 
-* **QuickSort cơ bản** (sử dụng phân hoạch Lomuto hoặc Hoare với pivot cố định).
-* **Radix Sort (MSD - Most Significant Digit)** chuyên dụng cho chuỗi, hoặc các hàm sắp xếp dựa trên cấu trúc từ điển.
-* **Các thuật toán sắp xếp ngây thơ** có độ phức tạp O(N^2) (Insertion Sort, Bubble Sort).
-* **Các thuật toán tối ưu chuẩn hóa** (MergeSort, HeapSort, Introsort) dùng làm mốc so sánh.
+* **Quick Sort thủ công:** Đặc biệt là các bản code không sử dụng kỹ thuật phân hoạch 3 chiều (3-way partitioning / Dutch National Flag) hoặc sử dụng chốt (pivot) cố định.
+* **Radix Sort thủ công:** Bao gồm cả hệ thống phân nhánh từ đầu đến cuối (MSD - Most Significant Digit) và sắp xếp từ cuối lên đầu cần đệm chuỗi (LSD - Least Significant Digit).
+* **Hàm so sánh (Comparator) kém tối ưu:** Nhắm vào các hàm viết gộp chung tiêu chí độ dài và từ điển nhưng không tối ưu hóa luồng rẽ nhánh logic.
+* **Hàm sắp xếp thư viện chuẩn (`std::sort`):** Dùng làm mốc đo lường khả năng chịu tải chi phí so sánh (Overhead comparison).
+
+---
 
 ### 2.3. Lý giải việc chọn thuật toán và tác dụng của Test
 
-* **Lý do chọn thuật toán mục tiêu:** Thông thường, phép so sánh hai số nguyên tiêu tốn chi phí O(1). Tuy nhiên, với chuỗi ký tự, chi phí này có thể lên tới O(L) (với L là độ dài chuỗi). Nhắm vào các thuật toán phổ biến, bộ test này đánh giá khả năng chống chịu của mã nguồn trước "chi phí ẩn" (hidden cost) khi phải duyệt qua các mảng chuỗi có độ tương đồng cực cao.
+**Lý do chọn thuật toán mục tiêu** Trong lập trình thi đấu, thí sinh thường tự implement Quick Sort hoặc Radix Sort để vượt qua các bài toán về chuỗi. Mặc dù lý thuyết chúng chạy rất nhanh, nhưng các code template này cực kỳ dễ bị sụp đổ (Time Limit Exceeded) khi gặp các edge case (trường hợp biên) làm thay đổi bản chất luồng đệ quy hoặc phân bổ bộ nhớ.
 
-* **Tại sao test case lại làm tăng thời gian chạy:**
-    * **Test001.in, Test003.in & Test004.in:** Việc tạo ra các chuỗi có đoạn đầu giống hệt nhau buộc các thuật toán dựa trên phép so sánh hoặc Radix Sort phải duyệt qua gần như toàn bộ chiều dài của chuỗi mới tìm ra được điểm khác biệt. Đặc biệt với **Test003.in**, chi phí cho một phép so sánh bị đẩy lên mức cực đại O(L), làm nghẽn cổ chai toàn bộ tiến trình sắp xếp.
-    * **Test005.in:** Việc giới hạn tập ký tự ở phần đuôi chỉ còn `a` và `b` tạo ra rất nhiều chuỗi trùng lặp hoặc có giá trị cực kỳ sát nhau. Điều này khiến QuickSort cơ bản gặp khó khăn trong việc phân hoạch mảng đồng đều, dễ làm mất cân bằng cây đệ quy và kéo độ phức tạp từ O(NlogN) sụp đổ xuống O(N^2).
-    * **Test002.in:** Đóng vai trò là bài kiểm tra nền tảng (Baseline test). Phân phối ngẫu nhiên đều giúp xác định một cách khách quan xem thuật toán có xử lý tốt ở trường hợp trung bình (Average-case) và đạt chuẩn hiệu năng O(NlogN) như kỳ vọng hay không.
+**Tại sao test case lại làm giảm cực độ thời gian chạy?**
 
+* **Test001.in:** Việc các chuỗi giống hệt nhau ở 99 ký tự đầu ép mọi phép toán so sánh `stringA < stringB` phải chạy vòng lặp xuyên qua toàn bộ độ dài chuỗi ($O(L)$). Kể cả `std::sort` cũng bị đẩy tổng thời gian lên ngưỡng $O(N \log N \times L)$, bào mòn giới hạn thời gian 1 giây một cách tàn nhẫn.
+* **Test002.in:** Quick Sort cơ bản (2-way partitioning) khi gặp mảng chứa hàng ngàn phần tử trùng lặp sẽ liên tục hoán vị và rẽ nhánh sai lệch. Điều này khiến cây đệ quy bị mất cân bằng trầm trọng, sụp đổ độ phức tạp từ $O(N \log N)$ xuống mức tồi tệ nhất là $O(N^2)$.
+* **Test003.in:** Đánh trúng tử huyệt của thuật toán MSD Radix Sort. Việc chia nhánh quá rộng ở 4 ký tự đầu tạo ra hàng nghìn "bucket" (xô) trống rỗng. Thuật toán vẫn phải cấp phát bộ nhớ và gọi đệ quy liên tục cho các bucket chỉ chứa 1 phần tử, tạo ra lượng hao phí tài nguyên (cache miss và overhead) khổng lồ.
+* **Test004.in:** Một "cái tát" trực diện vào những lập trình viên chọn pivot cho Quick Sort bằng phần tử đầu, cuối hoặc giữa mà quên bước ngẫu nhiên hóa (randomize). Với mảng sắp xếp ngược, Quick Sort sẽ luôn chia mảng thành một bên $0$ phần tử và một bên $N-1$ phần tử, lập tức đẩy thời gian chạy lên $O(N^2)$.
+* **Test005.in:** Khai thác lỗ hổng trong Radix Sort LSD. Để sắp xếp các chuỗi lệch độ dài (từ 10 đến 100), LSD thường phải thêm "ký tự ảo" (padding) vào các chuỗi ngắn cho bằng chuỗi dài nhất. Với sự chênh lệch lớn thế này, thuật toán sẽ thực hiện tới hàng chục nghìn phép toán vô nghĩa quét qua các vùng nhớ ảo, gây lãng phí năng lực xử lý trầm trọng.
 ---
 
 ## 3. PHÂN TÍCH LẦN CHẠY THỨ HAI (LẦN 2)
