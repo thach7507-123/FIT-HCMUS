@@ -243,7 +243,6 @@ Các thuật toán mục tiêu mà bộ test này nhắm tới để triệt ti�
 * Sử dụng **Bucket Sort / Counting Sort** ở vòng ngoài để phân nhóm chuỗi theo chiều dài với độ phức tạp `O(N)`, loại bỏ việc phải kiểm tra chiều dài khi so sánh.
 * Áp dụng **Indirect Sorting (Sắp xếp gián tiếp)** qua mảng chỉ số `idx` thay vì hoán đổi dữ liệu thật, đưa chi phí hoán vị (swap) chuỗi từ `O(L)` về `O(1)`.
 * Chuyển từ đệ quy sang **Iterative Quick Sort** bằng mảng stack thủ công (`stack_left`, `stack_right`) để loại bỏ hoàn toàn nguy cơ tràn bộ nhớ stack.
-* Áp dụng **Hybrid Sort / Fallback**: Tự động chuyển sang **Insertion Sort** khi kích thước mảng con cần phân hoạch đạt ngưỡng nhỏ (`<= 15`) để tối ưu hằng số thời gian.
 * Sử dụng mảng 1 chiều toàn cục (Global arrays) cấp phát tĩnh (`arr`, `idx`, `temp_idx`) với hằng số `MAXN` để tránh overhead của cấp phát bộ nhớ động rải rác.
 * Trích xuất độ dài chuỗi `.length()` đúng một lần trong pha nhập dữ liệu để đếm xô, không lặp lại thao tác này.
 * Tối ưu I/O cơ bản ở mức hệ thống bằng `ios::sync_with_stdio(false)` và `cin.tie(nullptr)`.
